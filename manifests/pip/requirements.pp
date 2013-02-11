@@ -2,6 +2,8 @@
 # Pip tries to upgrade packages when the requirements file changes.
 define python::pip::requirements($venv, $owner=undef, $group=undef) {
   $requirements = $name
+  $requirements_path = split($requirements, '/')
+  $requirements_dir = inline_template("<%= (requirements_path).first(requirements_path.size() - 1).join('/') %>")
   $checksum = "$venv/requirements.checksum"
 
   Exec {
@@ -29,7 +31,7 @@ define python::pip::requirements($venv, $owner=undef, $group=undef) {
 
   exec { "update $name requirements":
     command => "$venv/bin/pip install -Ur $requirements",
-    cwd => $venv,
+    cwd => $requirements_dir,
     timeout => 1800, # sometimes, this can take a while
     require => File[$requirements],
     unless => "sha1sum -c $checksum",
