@@ -30,7 +30,7 @@ define python::pip::requirements($venv, $owner=undef, $group=undef) {
   }
 
   exec { "update $name requirements":
-    command => "$venv/bin/pip install -Ur $requirements",
+    command => "$venv/bin/pip install --download-cache=$venv/cache -Ur $requirements",
     cwd => $requirements_dir,
     timeout => 1800, # sometimes, this can take a while
     require => File[$requirements],
