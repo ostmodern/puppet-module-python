@@ -12,13 +12,15 @@ define python::pip::requirements($venv, $owner=undef, $group=undef) {
     cwd => "/tmp",
   }
 
-  file { $requirements:
-    ensure => present,
-    replace => false,
-    owner => $owner,
-    group => $group,
-    content => "# Puppet will install packages listed here and update them if
-# the the contents of this file changes.",
+  if !defined(File["$requirements"]){
+    file { $requirements:
+      ensure => present,
+      replace => false,
+      owner => $owner,
+      group => $group,
+      content => "# Puppet will install packages listed here and update them if
+  # the the contents of this file changes.",
+    }
   }
 
   # We create a sha1 checksum of the requirements file so that
