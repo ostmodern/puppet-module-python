@@ -45,8 +45,7 @@ define python::gunicorn::instance($venv,
 
   if $is_present {
     python::pip::install {
-      "$gunicorn_package in $venv":
-        package => $gunicorn_package,
+      "$gunicorn_package":
         ensure => $ensure,
         venv => $venv,
         owner => $owner,
@@ -55,8 +54,7 @@ define python::gunicorn::instance($venv,
         before => File[$initscript];
 
       # for --name support in gunicorn:
-      "setproctitle in $venv":
-        package => "setproctitle",
+      "setproctitle":
         ensure => $ensure,
         venv => $venv,
         owner => $owner,
