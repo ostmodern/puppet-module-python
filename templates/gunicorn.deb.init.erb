@@ -38,6 +38,10 @@ CONFFILE=""
 CONFFILE="-c <%= conffile %>"
 <% end %>
 
+if [ -f "/etc/default/$NAME" ]; then
+	. /etc/default/$NAME
+fi
+
 DAEMON_OPTS="$CONFFILE -b $SOCKET -p $PIDFILE --log-file $LOGFILE \
 --workers $WORKERS -t $TIMEOUT --daemon --name $NAME $MODULE"
 
