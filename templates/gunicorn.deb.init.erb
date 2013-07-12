@@ -56,28 +56,24 @@ fi
 
 case "$1" in
   start)
-    echo -n "Starting $DESC: "
+    log_daemon_msg "Starting $DESC" $NAME
     start-stop-daemon -S $CHOWN -q -p $PIDFILE -d $SRC \
       -x $DAEMON -- $DAEMON_OPTS || true
-    echo "$NAME."
 	;;
   stop)
-    echo -n "Stopping $DESC: "
+    log_daemon_msg "Stopping $DESC" $NAME
     start-stop-daemon -K -q -p $PIDFILE -s QUIT || true
-    echo "$NAME."
 	;;
   restart)
-    echo -n "Restarting $DESC: "
+    log_daemon_msg "Restarting $DESC" $NAME
     start-stop-daemon -K -q -p $PIDFILE -s QUIT || true
     sleep 1
     start-stop-daemon -S $CHOWN -q -p $PIDFILE -d $SRC \
       -x $DAEMON -- $DAEMON_OPTS || true
-    echo "$NAME."
 	;;
   reload)
-    echo -n "Reloading $DESC: "
+    log_daemon_msg "Reloading $DESC" $NAME
     start-stop-daemon -K -q -p $PIDFILE -s HUP || true
-    echo "$NAME."
 	;;
   status)
     status_of_proc -p $PIDFILE "$DAEMON" $NAME && exit 0 || exit $?
