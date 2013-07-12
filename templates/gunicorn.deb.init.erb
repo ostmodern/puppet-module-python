@@ -59,10 +59,12 @@ case "$1" in
     log_daemon_msg "Starting $DESC" $NAME
     start-stop-daemon -S $CHOWN -q -p $PIDFILE -d $SRC \
       -x $DAEMON -- $DAEMON_OPTS || true
+    log_end_msg $?
 	;;
   stop)
     log_daemon_msg "Stopping $DESC" $NAME
     start-stop-daemon -K -q -p $PIDFILE -s QUIT || true
+    log_end_msg $?
 	;;
   restart)
     log_daemon_msg "Restarting $DESC" $NAME
@@ -70,10 +72,12 @@ case "$1" in
     sleep 1
     start-stop-daemon -S $CHOWN -q -p $PIDFILE -d $SRC \
       -x $DAEMON -- $DAEMON_OPTS || true
+    log_end_msg $?
 	;;
   reload)
     log_daemon_msg "Reloading $DESC" $NAME
     start-stop-daemon -K -q -p $PIDFILE -s HUP || true
+    log_end_msg $?
 	;;
   status)
     status_of_proc -p $PIDFILE "$DAEMON" $NAME && exit 0 || exit $?
