@@ -10,6 +10,7 @@ define python::gunicorn::instance($venv,
                                   $workers=1,
                                   $timeout_seconds=30,
                                   $conffile="",
+                                  $socket=undef,
                                   $environment={}) {
   $is_present = $ensure == "present"
 
@@ -21,7 +22,10 @@ define python::gunicorn::instance($venv,
   $initscript = "/etc/init.d/gunicorn-${name}"
   $defaultsfile = "/etc/default/gunicorn-${name}"
   $pidfile = "$rundir/$name.pid"
-  $socket = "unix:$rundir/$name.sock"
+  $real_socket = $socket ? {
+    undef   => "unix:${rundir}/${name}.sock",
+    default => $socket,
+  }
   $logfile = "$logdir/$name.log"
 
   if $wsgi_module == "" and !($django or $paste) {

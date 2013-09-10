@@ -19,7 +19,7 @@ CHOWN=""
 <% else %>
 CHOWN="--user <%= owner %>"
 <% end %>
-SOCKET=<%= socket %>
+SOCKET=<%= real_socket %>
 RUNDIR=<%= rundir %>
 PIDFILE=<%= pidfile %>
 LOGFILE=<%= logfile %>
