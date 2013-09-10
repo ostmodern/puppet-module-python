@@ -25,7 +25,7 @@ CHOWN=""
 <% else %>
 CHOWN="-c<%= owner %>:<%= group %>"
 <% end %>
-SOCKET=<%= socket %>
+SOCKET=<%= real_socket %>
 RUNDIR=<%= rundir %>
 PIDFILE=<%= pidfile %>
 LOGFILE=<%= logfile %>
