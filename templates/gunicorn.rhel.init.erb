@@ -9,24 +9,24 @@
 # Description:       starts the gunicorn server for <%= name %>
 ### END INIT INFO
 
-NAME=gunicorn-<%= name %>
+NAME=gunicorn-<%= @name %>
 DESC=$NAME
-VENV=<%= venv %>
-SRC=<%= src %>
-DAEMON=$VENV/bin/gunicorn<% if django %>_django<% end %><% if paste %>_paster<% end %>
-<% if owner == 'undef' or group == 'undef' %>
+VENV=<%= @venv %>
+SRC=<%= @src %>
+DAEMON=$VENV/bin/gunicorn<% if @django %>_django<% end %><% if @paste %>_paster<% end %>
+<% if @owner == 'undef' or @group == 'undef' %>
 CHOWN=""
 <% else %>
 CHOWN="--user <%= owner %>"
 <% end %>
-SOCKET=<%= real_socket %>
-RUNDIR=<%= rundir %>
-PIDFILE=<%= pidfile %>
-LOGFILE=<%= logfile %>
-WORKERS=<%= workers %>
-TIMEOUT=<%= timeout_seconds %>
-MODULE=<%= django ? django_settings : (paste ? paste_settings : wsgi_module) %>
-<% if django %>
+SOCKET=<%= @real_socket %>
+RUNDIR=<%= @rundir %>
+PIDFILE=<%= @pidfile %>
+LOGFILE=<%= @logfile %>
+WORKERS=<%= @workers %>
+TIMEOUT=<%= @timeout_seconds %>
+MODULE=<%= @django ? @django_settings : (@paste ? @paste_settings : @wsgi_module) %>
+<% if @django %>
 PYTHONPATH_PARAM="--pythonpath $SRC"
 <% else %>
 PYTHONPATH_PARAM=""
@@ -34,7 +34,7 @@ PYTHONPATH_PARAM=""
 <% if conffile == '' %>
 CONFFILE=""
 <% else %>
-CONFFILE="-c <%= conffile %>"
+CONFFILE="-c <%= @conffile %>"
 <% end %>
 
 DAEMON_OPTS="$CONFFILE -b $SOCKET -p $PIDFILE --log-file $LOGFILE \
@@ -49,8 +49,8 @@ set -e
 
 if [ ! -d $RUNDIR ]; then
   mkdir -p $RUNDIR
-  <% if owner != 'undef' and group != 'undef' %>
-  chown <%= owner %>:<%= group%> $RUNDIR
+  <% if @owner != 'undef' and @group != 'undef' %>
+  chown <%= @owner %>:<%= @group %> $RUNDIR
   <% end %>
 fi
 
