@@ -3,7 +3,7 @@
 define python::pip::requirements($venv, $owner=undef, $group=undef) {
   $requirements = $name
   $requirements_path = split($requirements, '/')
-  $requirements_dir = inline_template("<%= (requirements_path).first(requirements_path.size() - 1).join('/') %>")
+  $requirements_dir = inline_template("<%= (@requirements_path).first(@requirements_path.size() - 1).join('/') %>")
   $checksum = "$venv/requirements.checksum"
 
   Exec {
