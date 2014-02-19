@@ -44,7 +44,7 @@ CONFFILE="-c <%= @conffile %>"
 <% end %>
 
 if [ -f "/etc/default/$NAME" ]; then
-	. /etc/default/$NAME
+  . /etc/default/$NAME
 fi
 
 DAEMON_OPTS="$CONFFILE -b $SOCKET -p $PIDFILE --log-file $LOGFILE \
@@ -64,38 +64,57 @@ if [ ! -d $RUNDIR ]; then
   <% end %>
 fi
 
+
+
+gunicorn_start() {
+  log_daemon_msg "Starting $DESC" $NAME
+  start-stop-daemon -S $CHOWN -q -p $PIDFILE -d $SRC \
+    -x $DAEMON -- $DAEMON_OPTS || true
+
+  RET="$?"
+  log_end_msg $RET
+  return $RET
+}
+
+gunicorn_stop() {
+  log_daemon_msg "Stopping $DESC" $NAME
+  start-stop-daemon -K -q -p $PIDFILE -s QUIT || true
+  RET="$?"
+  log_end_msg $RET
+  return $RET
+
+}
+
+gunicorn_reload() {
+  log_daemon_msg "Reloading $DESC" $NAME
+  start-stop-daemon -K -q -p $PIDFILE -s HUP || true
+  RET="$?"
+  log_end_msg $RET
+  return $RET
+}
+
 case "$1" in
   start)
-    log_daemon_msg "Starting $DESC" $NAME
-    start-stop-daemon -S $CHOWN -q -p $PIDFILE -d $SRC \
-      -x $DAEMON -- $DAEMON_OPTS || true
-    log_end_msg $?
-	;;
+    gunicorn_start || exit 1
+  ;;
   stop)
-    log_daemon_msg "Stopping $DESC" $NAME
-    start-stop-daemon -K -q -p $PIDFILE -s QUIT || true
-    log_end_msg $?
-	;;
+    gunicorn_stop || exit 1
+  ;;
   restart)
-    log_daemon_msg "Restarting $DESC" $NAME
-    start-stop-daemon -K -q -p $PIDFILE -s QUIT || true
+    gunicorn_stop
     sleep 1
-    start-stop-daemon -S $CHOWN -q -p $PIDFILE -d $SRC \
-      -x $DAEMON -- $DAEMON_OPTS || true
-    log_end_msg $?
-	;;
+    gunicorn_start || exit 1
+  ;;
   reload)
-    log_daemon_msg "Reloading $DESC" $NAME
-    start-stop-daemon -K -q -p $PIDFILE -s HUP || true
-    log_end_msg $?
-	;;
+    gunicorn_reload || exit
+  ;;
   status)
     status_of_proc -p $PIDFILE "$DAEMON" $NAME && exit 0 || exit $?
-	;;
+  ;;
   *)
-	echo "Usage: $NAME {start|stop|restart|status}" >&2
-	exit 1
-	;;
+  echo "Usage: $NAME {start|stop|restart|status}" >&2
+  exit 1
+  ;;
 esac
 
 exit 0
