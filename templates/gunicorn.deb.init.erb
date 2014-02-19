@@ -68,8 +68,8 @@ fi
 
 gunicorn_start() {
   log_daemon_msg "Starting $DESC" $NAME
-  start-stop-daemon -S $CHOWN -q -p $PIDFILE -d $SRC \
-    -x $DAEMON -- $DAEMON_OPTS || true
+  start-stop-daemon --oknodo -S $CHOWN -q -p $PIDFILE -d $SRC \
+    -x $DAEMON -- $DAEMON_OPTS
 
   RET="$?"
   log_end_msg $RET
@@ -78,7 +78,7 @@ gunicorn_start() {
 
 gunicorn_stop() {
   log_daemon_msg "Stopping $DESC" $NAME
-  start-stop-daemon -K -q -p $PIDFILE -s QUIT || true
+  start-stop-daemon --oknodo -K -q -p $PIDFILE --retry QUIT/10/TERM/10/KILL/10
   RET="$?"
   log_end_msg $RET
   return $RET
@@ -87,7 +87,7 @@ gunicorn_stop() {
 
 gunicorn_reload() {
   log_daemon_msg "Reloading $DESC" $NAME
-  start-stop-daemon -K -q -p $PIDFILE -s HUP || true
+  start-stop-daemon --oknodo -K -q -p $PIDFILE -s HUP
   RET="$?"
   log_end_msg $RET
   return $RET
@@ -102,11 +102,10 @@ case "$1" in
   ;;
   restart)
     gunicorn_stop
-    sleep 1
     gunicorn_start || exit 1
   ;;
   reload)
-    gunicorn_reload || exit
+    gunicorn_reload || exit 1
   ;;
   status)
     status_of_proc -p $PIDFILE "$DAEMON" $NAME && exit 0 || exit $?
