@@ -8,7 +8,7 @@ define python::venv::isolate($ensure=present,
 
   if $ensure == 'present' {
     # Parent directory of root directory. /var/www for /var/www/blog
-    $root_parent = inline_template("<%= @root.match(%r!(.+)/.+!)[1] %>")
+    $root_parent = inline_template("<%= root.match(%r!(.+)/.+!)[1] %>")
 
     if !defined(File[$root_parent]) {
       file { $root_parent:
@@ -26,19 +26,19 @@ define python::venv::isolate($ensure=present,
 
     # Does not successfully run as www-data on Debian:
     exec { "python::venv $root":
-      command => "virtualenv -p `which ${python}` ${root}",
+      command => "virtualenv -p `which ${python}` --setuptools ${root}",
       creates => $root,
-      notify => Exec["update distribute and pip in $root"],
+      # notify => Exec["update distribute and pip in $root"],
       require => [File[$root_parent],
                   Package["python-virtualenv"]],
     }
 
     # Some newer Python packages require an updated distribute
     # from the one that is in repos on most systems:
-    exec { "update distribute and pip in $root":
-      command => "$root/bin/pip install -U pip distribute",
-      refreshonly => true,
-    }
+    # exec { "update distribute and pip in $root":
+    #   command => "$root/bin/pip install -U distribute pip",
+    #   refreshonly => true,
+    # }
 
     if $requirements {
       python::pip::requirements { $requirements:
